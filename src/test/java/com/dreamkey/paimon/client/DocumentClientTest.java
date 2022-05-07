@@ -3,15 +3,18 @@ package com.dreamkey.paimon.client;
 import com.alibaba.fastjson.JSONObject;
 import com.dreamkey.paimon.PaimonBaseTest;
 import com.dreamkey.paimon.bean.User;
+import com.dreamkey.paimon.common.annotation.SchemaInfo;
+import com.dreamkey.paimon.model.bean.Document;
 import com.dreamkey.paimon.model.bean.DocumentLog;
 import com.dreamkey.paimon.model.bean.PageInfo;
 import com.dreamkey.paimon.model.query.DocumentQuery;
-import com.dreamkey.paimon.util.LocalCache;
+import com.dreamkey.paimon.util.PaimonUtil;
 import com.util.TestUtils;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +46,8 @@ public class DocumentClientTest extends PaimonBaseTest {
     public void addDocumentStrTest(String str) throws IOException, IllegalAccessException {
         DocumentClient documentClient = new DocumentClient(config);
         JSONObject arg = TestUtils.getTestArg(str);
-        String documentId = documentClient.addDocument(arg.toJSONString());
+        User user = JSONObject.toJavaObject(arg, User.class);
+        String documentId = documentClient.addDocument(PaimonUtil.getSchemaName(user.getClass()),""+user.getUserId(),JSONObject.toJSONString(arg));
         System.out.println(documentId);
     }
 
@@ -52,6 +56,13 @@ public class DocumentClientTest extends PaimonBaseTest {
     public void getDocumentTest(String str) throws IOException {
         User user = documentClient.getDocument(str, User.class);
         System.out.println(user);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"3434343"})
+    public void getDocumentTestStr(String str) throws IOException {
+        Document document = documentClient.getDocument(str, PaimonUtil.getSchemaName(User.class));
+        System.out.println(document);
     }
 
     @ParameterizedTest
@@ -71,6 +82,17 @@ public class DocumentClientTest extends PaimonBaseTest {
         DocumentQuery query = JSONObject.toJavaObject(arg, DocumentQuery.class);
         PageInfo<User> pageInfo = documentClient.queryDocuments(page, size, query, User.class);
         System.out.println(pageInfo);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/api/document/queryDocument.json"})
+    public void queryDocumentStr(String str) throws IOException {
+        JSONObject arg = TestUtils.getTestArg(str);
+        Integer page = arg.getInteger("page");
+        Integer size = arg.getInteger("size");
+        DocumentQuery query = JSONObject.toJavaObject(arg, DocumentQuery.class);
+        String data = documentClient.queryDocuments(page, size, PaimonUtil.getSchemaName(User.class), query);
+        System.out.println(data);
     }
 
     @ParameterizedTest

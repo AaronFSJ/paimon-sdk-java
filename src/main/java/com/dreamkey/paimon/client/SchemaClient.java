@@ -29,23 +29,34 @@ public class SchemaClient {
     }
 
     /**
-     * 添加资产类型
+     * 添加资产类型，通过类获取 Schema 相关信息添加资产类型
      *
      * @param clazz 类信息，用于创建资产类型
      * @return
      * @throws IOException
      */
     public <T> String addSchema(Class<T> clazz) throws IOException {
-        Session session = PaimonUtil.getSession(config);
-        PaimonSchema paimonSchema = new PaimonSchema(config, session);
         // 获取类名
-        String name = clazz.getSimpleName();
+        String name = PaimonUtil.getSchemaName(clazz);
         // 反射获取类字段信息
         List<SchemaProperty> properties = this.getSchemaProperties(clazz);
         // 创建资产类型
         Schema schema = new Schema(name, properties);
+        return addSchema(schema);
+    }
+
+    /**
+     * 添加资产类型
+     * @param schema
+     * @return
+     * @throws IOException
+     */
+    public String addSchema(Schema schema) throws IOException{
+        Session session = PaimonUtil.getSession(config);
+        PaimonSchema paimonSchema = new PaimonSchema(config, session);
+        // 创建资产类型
         paimonSchema.addSchema(schema);
-        return name;
+        return schema.getName();
     }
 
     /**
@@ -86,7 +97,7 @@ public class SchemaClient {
         Session session = PaimonUtil.getSession(config);
         PaimonSchema paimonSchema = new PaimonSchema(config, session);
 
-        String name = clazz.getSimpleName();
+        String name = PaimonUtil.getSchemaName(clazz);
         ResponseEntity response = paimonSchema.getSchema(name);
 
         String data = response.getData();
@@ -94,19 +105,28 @@ public class SchemaClient {
     }
 
     /**
-     * 更新资产类型
+     * 更新资产类型，通过类获取 Schema 相关信息添加资产类型
      *
      * @param clazz 类信息，根据类属性上的注解来更新资产类型
      * @throws IOException
      */
     public <T> void updateSchema(Class<T> clazz) throws IOException {
-        Session session = PaimonUtil.getSession(config);
-        PaimonSchema paimonSchema = new PaimonSchema(config, session);
-
         String name = clazz.getSimpleName();
         List<SchemaProperty> properties = this.getSchemaProperties(clazz);
 
         Schema schema = new Schema(name, properties);
+        updateSchema(schema);
+    }
+
+
+    /**
+     * 更新资产类型
+     * @param schema
+     * @throws IOException
+     */
+    public void updateSchema(Schema schema) throws IOException {
+        Session session = PaimonUtil.getSession(config);
+        PaimonSchema paimonSchema = new PaimonSchema(config, session);
         paimonSchema.updateSchema(schema);
     }
 
@@ -117,11 +137,21 @@ public class SchemaClient {
      * @throws IOException
      */
     public <T> void deleteSchema(Class<T> clazz) throws IOException {
+        String name = clazz.getSimpleName();
+        deleteSchema(name);
+    }
+
+
+    /**
+     * 删除资产类型（删除资产类型将清除归属该类型的所有资产，谨慎调用，区块中会保留相关记录）
+     *
+     * @param schemaName
+     * @throws IOException
+     */
+    public <T> void deleteSchema(String schemaName) throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonSchema paimonSchema = new PaimonSchema(config, session);
-
-        String name = clazz.getSimpleName();
-        paimonSchema.deleteSchema(name);
+        paimonSchema.deleteSchema(schemaName);
     }
 
     /**
@@ -131,11 +161,20 @@ public class SchemaClient {
      * @throws IOException
      */
     public <T> void rebuildIndex(Class<T> clazz) throws IOException {
+        String name = PaimonUtil.getSchemaName(clazz);
+        rebuildIndex(name);
+    }
+
+    /**
+     * 重建文档类型字段索引（使用 update 方法更新字段后，如果改动字段索引状态需要调用此方法使索引重建生效）
+     *
+     * @param schemaName
+     * @throws IOException
+     */
+    public void rebuildIndex(String schemaName) throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonSchema paimonSchema = new PaimonSchema(config, session);
-
-        String name = clazz.getSimpleName();
-        paimonSchema.rebuildIndex(name);
+        paimonSchema.rebuildIndex(schemaName);
     }
 
     /**

@@ -37,13 +37,9 @@ public class PaimonDocument extends Paimon {
         this.requestPath = config.getAddress() + documentPath;
     }
 
-    /**
-     * 创建资产
-     *
-     * @return
-     * @throws IOException
-     */
-    public ResponseEntity addDocument(Document document) throws IOException {
+
+    public ResponseEntity addDocument(String schemaName, String documentId,String content) throws IOException{
+        Document document = new Document(documentId,content);
         String requestBody = JSONObject.toJSONString(document);
         // 组装 headers
         Map<String, String> headers = PaimonUtil.createHeader(RequestMethod.POST, documentPath, requestBody, config, this.session.getSession());
@@ -73,8 +69,26 @@ public class PaimonDocument extends Paimon {
      * @return
      * @throws IOException
      */
-    public ResponseEntity updateDocument(Document document) throws IOException {
-        String headerSignUrl = documentPath + document.getId();
+//    public ResponseEntity updateDocument(Document document) throws IOException {
+//        String headerSignUrl = documentPath + document.getId();
+//        String requestBody = JSONObject.toJSONString(document);
+//        Map<String, String> header = PaimonUtil.createHeader(RequestMethod.PUT, headerSignUrl, requestBody, config, this.session.getSession());
+//
+//        String url = requestPath + document.getId();
+//        return OkHttpUtil.builder().doPut(url, header, requestBody);
+//    }
+
+    /**
+     * 更新资产
+     * @param schemaName
+     * @param documentId
+     * @param content
+     * @return
+     * @throws IOException
+     */
+    public ResponseEntity updateDocument(String schemaName,String documentId,String content) throws IOException{
+        String headerSignUrl = documentPath + documentId;
+        Document document = new Document(documentId,content);
         String requestBody = JSONObject.toJSONString(document);
         Map<String, String> header = PaimonUtil.createHeader(RequestMethod.PUT, headerSignUrl, requestBody, config, this.session.getSession());
 

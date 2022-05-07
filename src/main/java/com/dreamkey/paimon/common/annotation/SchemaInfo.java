@@ -1,9 +1,6 @@
 package com.dreamkey.paimon.common.annotation;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * @author: Aaron
@@ -12,8 +9,9 @@ import java.lang.annotation.Target;
  * @modified by:
  */
 @Retention(value = RetentionPolicy.RUNTIME)
-@Target(value = {ElementType.FIELD})
-public @interface PaimonSchema {
+@Target(value = {ElementType.TYPE})
+@Documented
+public @interface SchemaInfo {
 
     String name();
 }

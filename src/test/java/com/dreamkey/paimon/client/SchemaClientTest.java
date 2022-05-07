@@ -20,7 +20,7 @@ public class SchemaClientTest extends PaimonBaseTest {
 
     @Test
     public void addSchemaTest() throws IOException {
-        String name = schemaClient.addSchema(Pokemon.class);
+        String name = schemaClient.addSchema(User.class);
         System.out.println(name);
     }
 

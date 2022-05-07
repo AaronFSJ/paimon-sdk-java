@@ -44,9 +44,9 @@ public class DocumentTest extends PaimonBaseTest {
         // 模拟实际业务传过来是一个普通对象
         List<Pokemon> pokemons = array.toJavaList(Pokemon.class);
         for (Pokemon p : pokemons) {
+            String schemaName = PaimonUtil.getSchemaName(p.getClass());
             String pokemonString = JSONObject.toJSONString(p);
-            Document document = new Document(p.getId(), pokemonString);
-            ResponseEntity response = paimonDocument.addDocument(document);
+            ResponseEntity response = paimonDocument.addDocument(schemaName,p.getId(),pokemonString);
             System.out.println(response);
         }
     }
@@ -66,8 +66,8 @@ public class DocumentTest extends PaimonBaseTest {
         // 模拟实际业务传过来是一个普通对象
         Pokemon pokemon = arg.toJavaObject(Pokemon.class);
         String pString = JSONObject.toJSONString(pokemon);
-        Document document = new Document(pokemon.getId(), pString);
-        ResponseEntity response = paimonDocument.updateDocument(document);
+//        Document document = new Document(pokemon.getId(), pString);
+        ResponseEntity response = paimonDocument.updateDocument(PaimonUtil.getSchemaName(pokemon.getClass()),pokemon.getId(),pString);
         System.out.println(response);
     }
 

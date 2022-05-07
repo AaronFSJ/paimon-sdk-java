@@ -4,12 +4,17 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.dreamkey.paimon.common.ResponseEntity;
 import com.dreamkey.paimon.common.StaticConstant;
+import com.dreamkey.paimon.common.annotation.DocId;
+import com.dreamkey.paimon.common.annotation.SchemaInfo;
 import com.dreamkey.paimon.common.enumerate.RequestMethod;
 import com.dreamkey.paimon.exception.PaimonException;
 import com.dreamkey.paimon.model.bean.PaimonConfig;
 import com.dreamkey.paimon.model.bean.Session;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,6 +142,50 @@ public class PaimonUtil {
         header.put("Paimon-Signature", signature);
 
         return header;
+    }
+
+
+    /**
+     * 获取类中 SchemaInfo 注解的 name 作为 schema name
+     * @param t
+     * @param <T>
+     * @return
+     */
+    public static  <T> String getSchemaName(Class<T> t) {
+        // 判断是否有使用 SchemaInfo 注解的字段，有的话作为 schema name
+        SchemaInfo schemaInfo = t.getAnnotation(SchemaInfo.class);
+        String name = "";
+        if (schemaInfo != null) {
+            name = String.valueOf(schemaInfo.name());
+        }
+
+        if(StringUtils.isEmpty(name)) {
+            throw new PaimonException("Schema name can not be empty");
+        }
+        return name;
+    }
+
+
+    /**
+     * 尝试获取到类中带有 @DocId 注解标注的字段作为资产 ID
+     *
+     * @param t
+     * @return
+     * @throws IllegalAccessException
+     */
+    public static  <T> String getDocumentId(T t) throws IllegalAccessException {
+        // 判断是否有使用 @DocId 注解的字段，有的话作为 资产ID
+        Field[] fields = t.getClass().getDeclaredFields();
+        String documentId = null;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            DocId docId = field.getAnnotation(DocId.class);
+            if (docId != null) {
+                documentId = String.valueOf(field.get(t));
+                break;
+            }
+        }
+        return documentId;
     }
 
 }

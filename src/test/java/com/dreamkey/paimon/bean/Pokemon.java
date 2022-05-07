@@ -2,6 +2,7 @@ package com.dreamkey.paimon.bean;
 
 import com.dreamkey.paimon.common.annotation.DocId;
 import com.dreamkey.paimon.common.annotation.Property;
+import com.dreamkey.paimon.common.annotation.SchemaInfo;
 import com.dreamkey.paimon.common.enumerate.PropertyType;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date 2022/3/24
  */
 @Data
+@SchemaInfo(name = "Pokemon")
 public class Pokemon {
 
     @DocId
