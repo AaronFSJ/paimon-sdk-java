@@ -1,0 +1,10 @@
+{
+  "name": "user1",
+  "properties": [
+    {
+      "name": "id",
+      "type": "string",
+      "indexed": true
+    }
+  ]
+}

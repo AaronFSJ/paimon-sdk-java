@@ -1,0 +1,9 @@
+{
+  "name": "user200",
+  "properties": [
+    {
+      "name": "id",
+      "type": "int"
+    }
+  ]
+}

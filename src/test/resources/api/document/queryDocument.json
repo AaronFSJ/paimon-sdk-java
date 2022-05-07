@@ -1,0 +1,11 @@
+{
+  "page": 1,
+  "size": 5,
+  "filters": [
+    {
+      "property": "name",
+      "operator": 0,
+      "value": "李四"
+    }
+  ]
+}

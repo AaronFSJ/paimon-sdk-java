@@ -1,0 +1,57 @@
+{
+  "name": "add_user",
+  "content": {
+    "steps": [
+      {
+        "action": "create_doc",
+        "params": [
+          "$user_doc",
+          "User",
+          "@1"
+        ]
+      },
+      {
+        "action": "set_property",
+        "params": [
+          "$user_doc",
+          "userId",
+          "@1"
+        ]
+      },
+      {
+        "action": "set_property",
+        "params": [
+          "$user_doc",
+          "name",
+          "@2"
+        ]
+      },
+      {
+        "action": "set_property",
+        "params": [
+          "$user_doc",
+          "sex",
+          "@3"
+        ]
+      },
+      {
+        "action": "set_property",
+        "params": [
+          "$user_doc",
+          "age",
+          "@4"
+        ]
+      },
+      {
+        "action": "update_doc",
+        "params": [
+          "User",
+          "$user_doc"
+        ]
+      },
+      {
+        "action": "submit"
+      }
+    ]
+  }
+}
