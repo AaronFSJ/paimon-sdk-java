@@ -65,6 +65,24 @@ public class PaimonSchema extends Paimon {
     }
 
     /**
+     * 检查 Schema 是否存在
+     * @param schemaName
+     * @return
+     * @throws IOException
+     */
+    public boolean checkSchemaExists(String schemaName)  throws IOException {
+        String uri = schemaPath + schemaName;
+        Map<String, String> header = PaimonUtil.createHeader(RequestMethod.HEAD, uri, "", config, session.getSession());
+
+        String url = config.getAddress() + uri;
+        ResponseEntity response = OkHttpUtil.builder().doHead(url, header, null);
+        if(StaticConstant.ERROR_CODE_OK .equals(response.getErrorCode())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * 获取单个资产详情
      *
      * @param name 资产类型名称
@@ -121,5 +139,6 @@ public class PaimonSchema extends Paimon {
         String url = config.getAddress() + uri;
         return OkHttpUtil.builder().doPost(url, header, "");
     }
+
 
 }

@@ -34,4 +34,12 @@ public class ResponseEntity {
         this.data = data;
     }
 
+    public static ResponseEntity ok(){
+        return new ResponseEntity(StaticConstant.ERROR_CODE_OK);
+    }
+
+    public static ResponseEntity error(){
+        return new ResponseEntity(StaticConstant.ERROR_CODE_ERROR);
+    }
+
 }

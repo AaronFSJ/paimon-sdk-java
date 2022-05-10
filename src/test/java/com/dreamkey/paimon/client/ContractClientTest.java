@@ -38,7 +38,7 @@ public class ContractClientTest extends PaimonBaseTest {
         String name = arg.getString("name");
         JSONArray jsonArray = arg.getJSONArray("parameters");
         String[] parameters = jsonArray.toArray(new String[0]);
-        contractClient.callContract(name, parameters);
+        contractClient.callContract(name, "234","常威","男","29");
     }
 
     @ParameterizedTest

@@ -3,9 +3,11 @@ package com.dreamkey.paimon.util;
 import com.alibaba.fastjson.JSONObject;
 import com.dreamkey.paimon.common.ResponseEntity;
 import com.dreamkey.paimon.common.StaticConstant;
+import com.dreamkey.paimon.common.enumerate.RequestMethod;
 import com.dreamkey.paimon.exception.PaimonException;
 import okhttp3.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.jetbrains.annotations.NotNull;
 
 import javax.net.ssl.SSLContext;
@@ -14,6 +16,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.net.http.HttpClient;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
@@ -37,6 +40,7 @@ public class OkHttpUtil {
     private Map<String, String> headerMap;
     private Map<String, String> paramMap;
     private String body;
+    private RequestMethod requestMethod;
 
 
     private String url;
@@ -151,7 +155,20 @@ public class OkHttpUtil {
      * @return
      */
     private OkHttpUtil get() {
+        requestMethod = RequestMethod.GET;
         request = new Request.Builder().get();
+        requestParams();
+        return this;
+    }
+
+    private OkHttpUtil head() {
+        requestMethod = RequestMethod.HEAD;
+        request = new Request.Builder().head().url(url);
+        requestParams();
+        return this;
+    }
+
+    private OkHttpUtil requestParams(){
         StringBuilder urlBuilder = new StringBuilder(url);
         if (paramMap != null) {
             urlBuilder.append("?");
@@ -192,10 +209,10 @@ public class OkHttpUtil {
             return RequestBody.create(body, mediaType);
         }
         return RequestBody.create("", mediaType);
-
     }
 
     private OkHttpUtil post(boolean isJsonPost) {
+        requestMethod = RequestMethod.POST;
         request = new Request.Builder()
                 .post(bodyDeal(isJsonPost))
                 .url(url);
@@ -203,15 +220,19 @@ public class OkHttpUtil {
     }
 
     private OkHttpUtil put(boolean isJsonPost) {
+        requestMethod = RequestMethod.PUT;
         request = new Request.Builder().put(bodyDeal(isJsonPost)).url(url);
         return this;
     }
 
 
     private OkHttpUtil delete(boolean isJsonPost) {
+        requestMethod = RequestMethod.DELETE;
         request = new Request.Builder().delete(bodyDeal(isJsonPost)).url(url);
         return this;
     }
+
+
 
     /**
      * 同步请求
@@ -222,7 +243,13 @@ public class OkHttpUtil {
         setHeader(request);
         try {
             Response response = okHttpClient.newCall(request.build()).execute();
-            if (StaticConstant.HTTP_STATUS_OK != response.code()) {
+
+            boolean b = HttpStatus.SC_NOT_FOUND == response.code() && requestMethod.equals(RequestMethod.HEAD);
+            if (HttpStatus.SC_OK != response.code()) {
+                if(HttpStatus.SC_NOT_FOUND ==  response.code()
+                        && requestMethod.equals(RequestMethod.HEAD)) {
+                    return ResponseEntity.error();
+                }
                 throw new PaimonException(response.message());
             }
 
@@ -371,6 +398,13 @@ public class OkHttpUtil {
                 .addHeaders(headerMap)
                 .addBody(body)
                 .post(true)
+                .sync();
+    }
+
+    public ResponseEntity doHead(String url, Map<String, String> headerMap, String body) {
+        return OkHttpUtil.builder().url(url)
+                .addHeaders(headerMap)
+                .head()
                 .sync();
     }
 

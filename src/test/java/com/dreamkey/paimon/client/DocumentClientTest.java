@@ -52,7 +52,7 @@ public class DocumentClientTest extends PaimonBaseTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"3434343"})
+    @ValueSource(strings = {"3333"})
     public void getDocumentTest(String str) throws IOException {
         User user = documentClient.getDocument(str, User.class);
         System.out.println(user);

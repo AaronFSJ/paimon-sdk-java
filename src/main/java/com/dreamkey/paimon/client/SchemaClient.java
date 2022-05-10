@@ -3,11 +3,13 @@ package com.dreamkey.paimon.client;
 import com.alibaba.fastjson.JSONObject;
 import com.dreamkey.paimon.application.PaimonSchema;
 import com.dreamkey.paimon.common.ResponseEntity;
+import com.dreamkey.paimon.common.StaticConstant;
 import com.dreamkey.paimon.common.annotation.Property;
 import com.dreamkey.paimon.model.bean.*;
 import com.dreamkey.paimon.model.query.BaseQuery;
 import com.dreamkey.paimon.util.AssertUtil;
 import com.dreamkey.paimon.util.PaimonUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -29,29 +31,29 @@ public class SchemaClient {
     }
 
     /**
-     * 添加资产类型，通过类获取 Schema 相关信息添加资产类型
+     * 创建资产类型，通过类获取 Schema 相关信息添加资产类型
      *
      * @param clazz 类信息，用于创建资产类型
      * @return
      * @throws IOException
      */
-    public <T> String addSchema(Class<T> clazz) throws IOException {
+    public <T> String createSchema(Class<T> clazz) throws IOException {
         // 获取类名
         String name = PaimonUtil.getSchemaName(clazz);
         // 反射获取类字段信息
         List<SchemaProperty> properties = this.getSchemaProperties(clazz);
         // 创建资产类型
         Schema schema = new Schema(name, properties);
-        return addSchema(schema);
+        return createSchema(schema);
     }
 
     /**
-     * 添加资产类型
+     * 创建资产类型
      * @param schema
      * @return
      * @throws IOException
      */
-    public String addSchema(Schema schema) throws IOException{
+    public String createSchema(Schema schema) throws IOException{
         Session session = PaimonUtil.getSession(config);
         PaimonSchema paimonSchema = new PaimonSchema(config, session);
         // 创建资产类型
@@ -87,6 +89,16 @@ public class SchemaClient {
     }
 
     /**
+     * 检查数据是否存在
+     * @param schemaName
+     */
+    public Boolean checkSchemaExists(String schemaName) throws IOException {
+        Session session = PaimonUtil.getSession(config);
+        PaimonSchema paimonSchema = new PaimonSchema(config, session);
+        return paimonSchema.checkSchemaExists(schemaName);
+    }
+
+    /**
      * 查询资产类型信息
      *
      * @param clazz 类信息，用于分析要查看的资产类型是哪一个
@@ -94,14 +106,24 @@ public class SchemaClient {
      * @throws IOException
      */
     public <T> Schema getSchema(Class<T> clazz) throws IOException {
+        String name = PaimonUtil.getSchemaName(clazz);
+        return getSchema(name);
+    }
+
+    /**
+     * 查询资产类型信息
+     *
+     * @param schemaName 资类类型名称
+     * @return
+     * @throws IOException
+     */
+    public Schema getSchema(String schemaName) throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonSchema paimonSchema = new PaimonSchema(config, session);
-
-        String name = PaimonUtil.getSchemaName(clazz);
-        ResponseEntity response = paimonSchema.getSchema(name);
+        ResponseEntity response = paimonSchema.getSchema(schemaName);
 
         String data = response.getData();
-        return JSONObject.parseObject(data, Schema.class);
+        return StringUtils.isEmpty(data) ? null : JSONObject.parseObject(data, Schema.class);
     }
 
     /**

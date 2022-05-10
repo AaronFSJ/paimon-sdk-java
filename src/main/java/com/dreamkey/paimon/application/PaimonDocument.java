@@ -10,6 +10,7 @@ import com.dreamkey.paimon.model.bean.Session;
 import com.dreamkey.paimon.model.query.DocumentQuery;
 import com.dreamkey.paimon.util.OkHttpUtil;
 import com.dreamkey.paimon.util.PaimonUtil;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -96,6 +97,19 @@ public class PaimonDocument extends Paimon {
         return OkHttpUtil.builder().doPut(url, header, requestBody);
     }
 
+
+    public boolean checkDocumentExists(String documentId)  throws IOException {
+        String headerSignUrl = documentPath + documentId;
+        Map<String, String> header = PaimonUtil.createHeader(RequestMethod.HEAD, headerSignUrl, "", config, session.getSession());
+
+        String url = requestPath + documentId;
+        ResponseEntity response = OkHttpUtil.builder().doHead(url, header, null);
+        if(StaticConstant.ERROR_CODE_OK .equals(response.getErrorCode())) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * 获取资产详情
      *
@@ -103,12 +117,19 @@ public class PaimonDocument extends Paimon {
      * @return
      * @throws IOException
      */
-    public ResponseEntity getDocument(String documentId) throws IOException {
+    public Document getDocument(String documentId) throws IOException {
+        if(!checkDocumentExists(documentId)){
+            return null;
+        }
+
         String headerSignUrl = documentPath + documentId;
         Map<String, String> header = PaimonUtil.createHeader(RequestMethod.GET, headerSignUrl, "", config, session.getSession());
 
         String url = requestPath + documentId;
-        return OkHttpUtil.builder().doGet(url, header, null);
+        ResponseEntity response = OkHttpUtil.builder().doGet(url, header, null);
+        String data = response.getData();
+        Document document = StringUtils.isEmpty(data)? null : JSONObject.parseObject(data, Document.class);
+        return document;
     }
 
     /**
@@ -144,5 +165,6 @@ public class PaimonDocument extends Paimon {
         String url = config.getAddress() + uri;
         return OkHttpUtil.builder().doGet(url, header, null);
     }
+
 
 }

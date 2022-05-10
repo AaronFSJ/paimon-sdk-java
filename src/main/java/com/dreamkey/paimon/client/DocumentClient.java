@@ -10,10 +10,11 @@ import com.dreamkey.paimon.util.PaimonUtil;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * 操作资产 API
+ * 操作资产实例 API
  *
  * @author: Aaron
  * @description:
@@ -29,7 +30,7 @@ public class DocumentClient {
     }
 
     /**
-     * 添加资产，以用户传入的实体添加资产
+     * 添加资产实例，以用户传入的实体添加资产实例
      *
      * @param t 泛型，任意已有对应资产类型的资产对象
      * @return
@@ -150,6 +151,11 @@ public class DocumentClient {
         return data;
     }
 
+    public Boolean checkDocumentExists (String documentId, String schemaName) throws IOException {
+        Session session = PaimonUtil.getSession(config);
+        PaimonDocument paimonDocument = new PaimonDocument(config, session, schemaName);
+        return paimonDocument.checkDocumentExists(documentId);
+    }
 
 
 
@@ -164,6 +170,9 @@ public class DocumentClient {
     public <T> T getDocument(String documentId, Class<T> clazz) throws IOException {
         String name = PaimonUtil.getSchemaName(clazz);
         Document document = getDocument(documentId,name);
+        if(Objects.isNull(document)) {
+            return null;
+        }
         String content = document.getContent();
         return JSONObject.toJavaObject(JSONObject.parseObject(content), clazz);
     }
@@ -180,11 +189,7 @@ public class DocumentClient {
     public Document getDocument(String documentId, String schemaName) throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonDocument paimonDocument = new PaimonDocument(config, session, schemaName);
-        ResponseEntity response = paimonDocument.getDocument(documentId);
-
-        String data = response.getData();
-        Document document = JSONObject.parseObject(data, Document.class);
-        return document;
+        return paimonDocument.getDocument(documentId);
     }
 
     /**
@@ -214,7 +219,7 @@ public class DocumentClient {
     }
 
     /**
-     * 查询资产变更日志，通过类 class 获取 schemaName 实现资产变更
+     * 查询资产实例变更日志，通过类 class 获取 schemaName 实现资产变更
      *
      * @param documentId 资产 ID
      * @param clazz      类信息，用于分析删除的资产所属资产类型
@@ -227,14 +232,14 @@ public class DocumentClient {
     }
 
     /**
-     * 查询资产变更日志
+     * 查询资产实例变更日志
      *
      * @param documentId 资产 ID
      * @param schemaName
      * @return
      * @throws IOException
      */
-    public  DocumentLog getDocumentLog(String documentId, String schemaName) throws IOException {
+    public DocumentLog getDocumentLog(String documentId, String schemaName) throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonDocument paimonDocument = new PaimonDocument(config, session, schemaName);
         ResponseEntity response = paimonDocument.getDocumentLog(documentId);

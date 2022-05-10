@@ -9,6 +9,7 @@ import com.dreamkey.paimon.model.bean.*;
 import com.dreamkey.paimon.util.PaimonUtil;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * 查看一些系统参数
@@ -47,10 +48,10 @@ public class SystemInfoClient {
     public DomainParameter getDomainParameter() throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonDocument paimonDocument = new PaimonDocument(config, session, "_domain_parameters");
-        ResponseEntity response = paimonDocument.getDocument(config.getDomain());
-
-        JSONObject data = JSONObject.parseObject(response.getData());
-        Document document = JSONObject.toJavaObject(data, Document.class);
+        Document document = paimonDocument.getDocument(config.getDomain());
+        if(Objects.isNull(document)) {
+            return null;
+        }
 
         String domain = document.getId();
         String content = document.getContent();
@@ -69,10 +70,10 @@ public class SystemInfoClient {
     public ProposalRule getProposalRule() throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonDocument paimonDocument = new PaimonDocument(config, session, "_proposal_rules");
-        ResponseEntity response = paimonDocument.getDocument(config.getDomain());
-
-        JSONObject data = JSONObject.parseObject(response.getData());
-        Document document = JSONObject.toJavaObject(data, Document.class);
+        Document document = paimonDocument.getDocument(config.getDomain());
+        if(Objects.isNull(document)) {
+            return null;
+        }
 
         String domain = document.getId();
         String content = document.getContent();
@@ -88,7 +89,7 @@ public class SystemInfoClient {
      * @return
      * @throws IOException
      */
-    public Change getChangeMember() throws IOException {
+    public ChangeRule getChangeMember() throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonDocument paimonDocument = new PaimonDocument(config, session, StaticConstant.CHANGE_MEMBER);
         return getCommonChange(paimonDocument);
@@ -100,7 +101,7 @@ public class SystemInfoClient {
      * @return
      * @throws IOException
      */
-    public Change getChangeCommittee() throws IOException {
+    public ChangeRule getChangeCommittee() throws IOException {
         Session session = PaimonUtil.getSession(config);
         PaimonDocument paimonDocument = new PaimonDocument(config, session, StaticConstant.CHANGE_COMMITTEE);
         return getCommonChange(paimonDocument);
@@ -112,18 +113,18 @@ public class SystemInfoClient {
      * @return
      * @throws IOException
      */
-    private Change getCommonChange(PaimonDocument paimonDocument) throws IOException {
-        ResponseEntity response = paimonDocument.getDocument(config.getDomain());
-
-        JSONObject data = JSONObject.parseObject(response.getData());
-        Document document = JSONObject.toJavaObject(data, Document.class);
+    private ChangeRule getCommonChange(PaimonDocument paimonDocument) throws IOException {
+        Document document = paimonDocument.getDocument(config.getDomain());
+        if(Objects.isNull(document)) {
+            return null;
+        }
 
         String domain = document.getId();
         String content = document.getContent();
-        Change change = JSONObject.parseObject(content, Change.class);
-        change.setDomain(domain);
+        ChangeRule changeRule = JSONObject.parseObject(content, ChangeRule.class);
+        changeRule.setDomain(domain);
 
-        return change;
+        return changeRule;
     }
 
 }

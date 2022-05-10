@@ -79,7 +79,7 @@ public class BlockClient {
     }
 
     /**
-     * 分页查询区块中的交易
+     * 区块中的交易分页查询
      *
      * @param blockId 区块 ID（哈希）
      * @param page    当前页码

@@ -1,7 +1,7 @@
 package com.dreamkey.paimon.client;
 
 import com.dreamkey.paimon.PaimonBaseTest;
-import com.dreamkey.paimon.model.bean.Change;
+import com.dreamkey.paimon.model.bean.ChangeRule;
 import com.dreamkey.paimon.model.bean.DomainParameter;
 import com.dreamkey.paimon.model.bean.DomainStatus;
 import com.dreamkey.paimon.model.bean.ProposalRule;
@@ -38,13 +38,13 @@ public class SystemInfoClientTest extends PaimonBaseTest {
 
     @Test
     public void getChangeCommitteeTest() throws IOException {
-        Change changeCommittee = systemInfoClient.getChangeCommittee();
-        System.out.println(changeCommittee);
+        ChangeRule changeRuleCommittee = systemInfoClient.getChangeCommittee();
+        System.out.println(changeRuleCommittee);
     }
 
     @Test
     public void getChangeMemberTest() throws IOException {
-        Change changeMember = systemInfoClient.getChangeMember();
-        System.out.println(changeMember);
+        ChangeRule changeRuleMember = systemInfoClient.getChangeMember();
+        System.out.println(changeRuleMember);
     }
 }

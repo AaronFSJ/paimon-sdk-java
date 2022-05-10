@@ -26,7 +26,7 @@ public class ContractClient {
 
 
     /**
-     * 分页查询智能合约
+     * 智能合约分页查询
      *
      * @param page 当前页码
      * @param size 每页记录数

@@ -1,8 +1,8 @@
 package com.dreamkey.paimon.client;
 
 import com.dreamkey.paimon.PaimonBaseTest;
-import com.dreamkey.paimon.bean.Pokemon;
 import com.dreamkey.paimon.bean.User;
+import com.dreamkey.paimon.common.ResponseEntity;
 import com.dreamkey.paimon.model.bean.PageInfo;
 import com.dreamkey.paimon.model.bean.Schema;
 import org.junit.jupiter.api.Test;
@@ -19,8 +19,8 @@ public class SchemaClientTest extends PaimonBaseTest {
 
 
     @Test
-    public void addSchemaTest() throws IOException {
-        String name = schemaClient.addSchema(User.class);
+    public void addSchemaTestUser() throws IOException {
+        String name = schemaClient.createSchema(User.class);
         System.out.println(name);
     }
 
@@ -32,9 +32,15 @@ public class SchemaClientTest extends PaimonBaseTest {
 
     @Test
     public void getSchemaTest() throws IOException {
-        Schema schema = schemaClient.getSchema(User.class);
+        Schema schema = schemaClient.getSchema("eee");
         System.out.println(schema);
     }
+
+    @Test
+    public void checkSchemaExistsTest() throws IOException {
+        System.out.println(schemaClient.checkSchemaExists("ee"));
+    }
+
 
     @Test
     public void updateSchemaTest() throws IOException {

@@ -14,6 +14,11 @@ public class StaticConstant {
     public static final Integer ERROR_CODE_OK = 0;
 
     /**
+     * Paimon 处理请求失败返回的状态码
+     */
+    public static final Integer ERROR_CODE_ERROR = -1;
+
+    /**
      * Http 请求成功状态码
      */
     public static final Integer HTTP_STATUS_OK = 200;

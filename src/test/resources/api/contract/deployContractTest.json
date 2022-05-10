@@ -6,7 +6,7 @@
         "action": "create_doc",
         "params": [
           "$user_doc",
-          "User",
+          "user",
           "@1"
         ]
       },
@@ -45,7 +45,7 @@
       {
         "action": "update_doc",
         "params": [
-          "User",
+          "user",
           "$user_doc"
         ]
       },

@@ -20,6 +20,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author: Aaron
@@ -74,8 +75,8 @@ public class DocumentTest extends PaimonBaseTest {
     @Test
     public void getDocument() throws IOException {
         String documentId = "1";
-        ResponseEntity responseEntity = paimonDocument.getDocument(documentId);
-        System.out.println(responseEntity);
+        Document document = paimonDocument.getDocument(config.getDomain());
+        System.out.println(document);
     }
 
     @Test
